@@ -62,39 +62,213 @@ npm start
 
 ## 4. Explainations<a name="explainations"></a>
 
-Step 1 — Initially render grey image (loading image)
+React Router, and dynamic, client-side routing, allows us to build a single-page web application with navigation without the page refreshing as the user navigates. React Router uses component structure to call components, which display the appropriate information.
 
-```shell
-<img alt={author} src={grey} />
+### Installation
+
+```
+npm create-react-app react-router
+cd react-router
+npm install react-router-dom
 ```
 
-Step 2 - Set up Ref
+-   [Home.js](src/components/Home.js)
+-   [About.js](src/components/About.js)
+-   [Navigation.js](src/components/Navigation.js)
 
-```shell
-import React, { useRef } from 'react'
-const thisImage = useRef()
-<img ref={thisImage} alt={author} src={grey} />
+### Create Route
+
+```javascript
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+
+function App() {
+	return (
+		<div className='App'>
+			<Router>
+				<Navigation />
+				<Route path='/' exact component={Home} />
+				<Route path='/About' exact component={About} />
+			</Router>
+		</div>
+	)
+}
+export default App
 ```
 
-Step 3 — Set up detection
+### Manage Links
 
-```shell
-useEffect(() => {
-		let observer = new IntersectionObserver(
-			(entries) =>
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						console.log('intersect')
-						thisImage.current.src = url
-						observer = observer.disconnect()
-					}
-				}),
-			{ rootMargin: '0px 0px 200px 0px' }
-		)
-		observer.observe(thisImage.current)
-	}, [url])
+```javascript
+import React from 'react'
+import Link from 'react-router-dom'
+
+export const Navigation = () => {
+	return (
+		<ul style={{ display: 'flex' }}>
+			{/* Create Link to=... */}
+			<Link to='/'>
+				<li style={{ marginLeft: 10, listStyle: 'none' }}>Home</li>
+			</Link>
+
+			<Link to='/About'>
+				<li style={{ marginLeft: 10, listStyle: 'none' }}>About</li>
+			</Link>
+		</ul>
+	)
+}
+```
+
+### Router Switch
+
+Switch allow to render only the first route that matches.
+
+```javascript
+<Router>
+	<Navigation />
+	<Switch>
+		<Route path='/' exact component={Home} />
+		<Route path='/About' exact component={About} />
+
+		{/* Catch all pages that didn't match the routes before and display Error_404 */}
+		<Route path='/' component={Error_404} />
+	</Switch>
+</Router>
+```
+
+### History
+
+App Architecture, use to navigate between pages. Use useHistory (custom react-router hook).
+
+```javascript
+import React from 'react'
+import { useHistory } from 'react-router-dom'
+
+export const About = () => {
+	// Using useHistory Hook
+	const history = useHistory()
+
+	return (
+		<div>
+			<h1>About Component Page</h1>
+			{/* onClick arrow function history.push to path */}
+			<button onClick={() => history.push('/')}>Home</button>
+		</div>
+	)
+}
+```
+
+### Navlink
+
+1. Handle activeClassName, Eg: color selected link in navbar
+
+```javascript
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+
+export const Navigation = () => {
+	return (
+		<ul style={{ display: 'flex' }}>
+			{/* Use activeClassName to apply our CSS style to the exact current NavLink */}
+			<NavLink exact activeClassName='current' to='/'>
+				<li style={{ marginLeft: 10, listStyle: 'none' }}>Home</li>
+			</NavLink>
+
+			<NavLink exact activeClassName='current' to='/About'>
+				<li style={{ marginLeft: 10, listStyle: 'none' }}>About</li>
+			</NavLink>
+		</ul>
+	)
+}
+```
+
+2. useParams Slug
+
+useParams returns an object of key/value pairs of URL parameters. Use it to access match.params of the current Route
+
+Update the Router, Route component.
+
+```javascript
+<Route path='/About/:name' exact component={About} />
+```
+
+```javascript
+import { useParams } from 'react-router-dom'
+
+export const About = () => {
+	const history = useHistory()
+	let name = useParams().name
+	let message = ''
+	name ? (message = 'This page is about ' + name) : (message = '')
+
+	return (
+		<div>
+			<h1>About Component Page</h1>
+			<p>{message}</p>
+			<button onClick={() => history.push('/')}>Home</button>
+		</div>
+	)
+}
+```
+
+3. useLocation
+
+The useLocation hook returns the location object that represents the current URL. You can think about it like a useState that returns a new location whenever the URL changes.
+
+In home.js
+
+```javascript
+import React from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
+
+export const Home = () => {
+	const history = useHistory()
+	let location = useLocation()
+
+	return (
+		<div>
+			<h1>Home Component Page</h1>
+			<button onClick={() => history.push('/About')}>About</button>
+
+			<div>
+				<p>{location.state.contact}</p>
+			</div>
+		</div>
+	)
+}
+```
+
+In about.js
+
+```javascript
+import React from 'react'
+import { useHistory } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
+
+export const About = () => {
+	const history = useHistory()
+	let name = useParams().name
+	let message = ''
+	name ? (message = 'This page is about ' + name) : (message = '')
+
+	return (
+		<div>
+			<h1>About Component Page</h1>
+			<p>{message}</p>
+			<button onClick={() => history.push('/')}>Home</button>
+
+			<Link
+				to={{
+					pathname: '/',
+					state: {
+						contact: name,
+					},
+				}}>
+				Go to Home with state
+			</Link>
+		</div>
+	)
+}
 ```
 
 ## 5. Screenshots<a name="screenshots"></a>
 
-![React Router Screenshot](https://github.com/antoineratat/react_lazyloading/blob/main/screenshots/1.PNG?raw=true)
+![React Router Screenshot](https://github.com/antoineratat/react_router/blob/main/screenshots/1.PNG?raw=true)
