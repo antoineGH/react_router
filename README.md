@@ -271,4 +271,4 @@ export const About = () => {
 
 ## 5. Screenshots<a name="screenshots"></a>
 
-![React Router Screenshot](https://github.com/antoineratat/react_router/blob/main/screenshots/1.PNG?raw=true)
+![React Router Screenshot](https://templars.guru/app/github/react_router/1.PNG)
